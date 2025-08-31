@@ -1,0 +1,68 @@
+{
+  "top_campaigns": [
+    { 
+      "name": "Back Pain Relief - August", 
+      "sends": 5200, 
+      "open": 0.41, 
+      "click": 0.19, 
+      "bookings": 286, 
+      "best_location": "Nashville, TN" 
+    },
+    { 
+      "name": "Neck Pain Tips", 
+      "sends": 3800, 
+      "open": 0.38, 
+      "click": 0.17, 
+      "bookings": 204, 
+      "best_location": "Phoenix, AZ" 
+    },
+    { 
+      "name": "Sciatica Solutions", 
+      "sends": 2900, 
+      "open": 0.42, 
+      "click": 0.21, 
+      "bookings": 178, 
+      "best_location": "Dallas, TX" 
+    },
+    { 
+      "name": "Summer Posture Check", 
+      "sends": 4100, 
+      "open": 0.35, 
+      "click": 0.14, 
+      "bookings": 152, 
+      "best_location": "Austin, TX" 
+    },
+    { 
+      "name": "Sports Injury Prevention", 
+      "sends": 3200, 
+      "open": 0.39, 
+      "click": 0.18, 
+      "bookings": 141, 
+      "best_location": "Denver, CO" 
+    }
+  ],
+  "by_content_type": [
+    { "type": "Condition-Specific", "avg_bookings": 5.8 },
+    { "type": "Seasonal Health", "avg_bookings": 4.2 },
+    { "type": "Wellness Tips", "avg_bookings": 3.1 },
+    { "type": "Generic Promo", "avg_bookings": 2.5 }
+  ],
+  "timeline": [
+    { "date": "2025-08-01", "sends": 800, "opens": 320, "clicks": 140, "bookings": 22 },
+    { "date": "2025-08-05", "sends": 950, "opens": 380, "clicks": 165, "bookings": 28 },
+    { "date": "2025-08-08", "sends": 1200, "opens": 492, "clicks": 216, "bookings": 38 },
+    { "date": "2025-08-12", "sends": 1100, "opens": 451, "clicks": 198, "bookings": 34 },
+    { "date": "2025-08-15", "sends": 1300, "opens": 520, "clicks": 234, "bookings": 42 },
+    { "date": "2025-08-19", "sends": 900, "opens": 369, "clicks": 162, "bookings": 26 },
+    { "date": "2025-08-22", "sends": 1400, "opens": 574, "clicks": 252, "bookings": 45 },
+    { "date": "2025-08-26", "sends": 1050, "opens": 431, "clicks": 189, "bookings": 31 },
+    { "date": "2025-08-29", "sends": 1250, "opens": 513, "clicks": 225, "bookings": 39 }
+  ],
+  "what_worked": [
+    "Condition-specific subject lines beat generic by 2.3x CTR",
+    "Including the chat link above the fold increased bookings by 41%",
+    "SMS campaigns sent Tuesday/Thursday at 10am had highest engagement",
+    "Personal testimonials in newsletters drove 28% more clicks",
+    "Locations using 4+ channels averaged 62% higher conversion"
+  ]
+}

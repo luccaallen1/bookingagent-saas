@@ -1,0 +1,81 @@
+{
+  "period": "last_30_days",
+  "kpis": {
+    "conversations": { "value": 12450, "delta": 0.12 },
+    "bookings": { "value": 3280, "delta": 0.18 },
+    "conversion": { "value": 0.263, "delta": 0.05 },
+    "revenue": { "value": 214560, "delta": 0.11 },
+    "active_locations": { "value": 58, "delta": 0.03 }
+  },
+  "series": {
+    "by_day": [
+      { "date": "2025-08-01", "conversations": 390, "bookings": 96 },
+      { "date": "2025-08-02", "conversations": 402, "bookings": 101 },
+      { "date": "2025-08-03", "conversations": 415, "bookings": 108 },
+      { "date": "2025-08-04", "conversations": 380, "bookings": 92 },
+      { "date": "2025-08-05", "conversations": 425, "bookings": 115 },
+      { "date": "2025-08-06", "conversations": 440, "bookings": 118 },
+      { "date": "2025-08-07", "conversations": 398, "bookings": 104 },
+      { "date": "2025-08-08", "conversations": 410, "bookings": 107 },
+      { "date": "2025-08-09", "conversations": 422, "bookings": 112 },
+      { "date": "2025-08-10", "conversations": 395, "bookings": 98 },
+      { "date": "2025-08-11", "conversations": 388, "bookings": 95 },
+      { "date": "2025-08-12", "conversations": 430, "bookings": 116 },
+      { "date": "2025-08-13", "conversations": 445, "bookings": 122 },
+      { "date": "2025-08-14", "conversations": 408, "bookings": 106 },
+      { "date": "2025-08-15", "conversations": 418, "bookings": 110 },
+      { "date": "2025-08-16", "conversations": 435, "bookings": 120 },
+      { "date": "2025-08-17", "conversations": 392, "bookings": 99 },
+      { "date": "2025-08-18", "conversations": 385, "bookings": 94 },
+      { "date": "2025-08-19", "conversations": 428, "bookings": 114 },
+      { "date": "2025-08-20", "conversations": 450, "bookings": 125 },
+      { "date": "2025-08-21", "conversations": 412, "bookings": 108 },
+      { "date": "2025-08-22", "conversations": 420, "bookings": 111 },
+      { "date": "2025-08-23", "conversations": 438, "bookings": 119 },
+      { "date": "2025-08-24", "conversations": 405, "bookings": 103 },
+      { "date": "2025-08-25", "conversations": 390, "bookings": 97 },
+      { "date": "2025-08-26", "conversations": 432, "bookings": 117 },
+      { "date": "2025-08-27", "conversations": 448, "bookings": 124 },
+      { "date": "2025-08-28", "conversations": 415, "bookings": 109 },
+      { "date": "2025-08-29", "conversations": 425, "bookings": 113 },
+      { "date": "2025-08-30", "conversations": 442, "bookings": 121 }
+    ]
+  },
+  "channels": [
+    { "label": "Voice Agent", "bookings": 1180, "tag": "Inbound" },
+    { "label": "Website Chat", "bookings": 920, "tag": "Inbound" },
+    { "label": "Instagram DM", "bookings": 430, "tag": "Inbound" },
+    { "label": "SMS Link", "bookings": 160, "tag": "Inbound" },
+    { "label": "Newsletter Link", "bookings": 370, "tag": "Outreach" },
+    { "label": "SMS Campaign", "bookings": 150, "tag": "Outreach" },
+    { "label": "QR Code", "bookings": 70, "tag": "Outreach" }
+  ],
+  "leaderboards": {
+    "by_bookings": [
+      { "location": "Dallas, TX", "bookings": 142 },
+      { "location": "Scottsdale, AZ", "bookings": 131 },
+      { "location": "Nashville, TN", "bookings": 128 },
+      { "location": "Boulder, CO", "bookings": 124 },
+      { "location": "Austin, TX", "bookings": 119 }
+    ],
+    "by_conversion": [
+      { "location": "Boise, ID", "conversion": 0.36 },
+      { "location": "Madison, WI", "conversion": 0.34 },
+      { "location": "Portland, OR", "conversion": 0.33 },
+      { "location": "Burlington, VT", "conversion": 0.32 },
+      { "location": "Salt Lake City, UT", "conversion": 0.31 }
+    ],
+    "growth_movers": [
+      { "location": "Tampa, FL", "delta_bookings": 0.28 },
+      { "location": "Irvine, CA", "delta_bookings": 0.24 },
+      { "location": "Charlotte, NC", "delta_bookings": 0.22 },
+      { "location": "Phoenix, AZ", "delta_bookings": 0.19 },
+      { "location": "Denver, CO", "delta_bookings": 0.17 }
+    ]
+  },
+  "trending_tactic": {
+    "title": "Back-to-School Posture Check SMS",
+    "result": "Avg +12 bookings in 2 weeks",
+    "cta": { "label": "Publish Playbook", "link": "/hq/insights" }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "topics": [
+    { "label": "Back Pain", "count": 2650, "delta": 0.12 },
+    { "label": "Neck Pain", "count": 1870, "delta": 0.08 },
+    { "label": "Pricing", "count": 990, "delta": 0.18 },
+    { "label": "Insurance", "count": 770, "delta": 0.02 },
+    { "label": "Sciatica", "count": 540, "delta": 0.15 },
+    { "label": "Headaches", "count": 485, "delta": -0.05 },
+    { "label": "Shoulder Pain", "count": 420, "delta": 0.22 },
+    { "label": "Appointment Availability", "count": 380, "delta": 0.09 },
+    { "label": "Sports Injuries", "count": 320, "delta": 0.28 },
+    { "label": "Posture Issues", "count": 290, "delta": 0.14 }
+  ],
+  "series_by_region": {
+    "West": [
+      { "date": "2025-08-01", "back_pain": 42, "neck_pain": 33, "pricing": 18 },
+      { "date": "2025-08-08", "back_pain": 45, "neck_pain": 38, "pricing": 21 },
+      { "date": "2025-08-15", "back_pain": 48, "neck_pain": 42, "pricing": 19 },
+      { "date": "2025-08-22", "back_pain": 51, "neck_pain": 45, "pricing": 23 },
+      { "date": "2025-08-29", "back_pain": 47, "neck_pain": 40, "pricing": 20 }
+    ],
+    "South": [
+      { "date": "2025-08-01", "back_pain": 61, "neck_pain": 40, "pricing": 22 },
+      { "date": "2025-08-08", "back_pain": 64, "neck_pain": 43, "pricing": 24 },
+      { "date": "2025-08-15", "back_pain": 68, "neck_pain": 45, "pricing": 26 },
+      { "date": "2025-08-22", "back_pain": 65, "neck_pain": 42, "pricing": 23 },
+      { "date": "2025-08-29", "back_pain": 69, "neck_pain": 46, "pricing": 25 }
+    ],
+    "Midwest": [
+      { "date": "2025-08-01", "back_pain": 38, "neck_pain": 28, "pricing": 15 },
+      { "date": "2025-08-08", "back_pain": 40, "neck_pain": 30, "pricing": 17 },
+      { "date": "2025-08-15", "back_pain": 42, "neck_pain": 32, "pricing": 16 },
+      { "date": "2025-08-22", "back_pain": 39, "neck_pain": 29, "pricing": 18 },
+      { "date": "2025-08-29", "back_pain": 43, "neck_pain": 33, "pricing": 19 }
+    ],
+    "Northeast": [
+      { "date": "2025-08-01", "back_pain": 35, "neck_pain": 31, "pricing": 20 },
+      { "date": "2025-08-08", "back_pain": 37, "neck_pain": 33, "pricing": 22 },
+      { "date": "2025-08-15", "back_pain": 39, "neck_pain": 35, "pricing": 21 },
+      { "date": "2025-08-22", "back_pain": 36, "neck_pain": 32, "pricing": 23 },
+      { "date": "2025-08-29", "back_pain": 40, "neck_pain": 36, "pricing": 24 }
+    ]
+  },
+  "callouts": [
+    { 
+      "region": "West", 
+      "text": "Neck pain inquiries +18% vs national avg; recommend posture content playbook" 
+    },
+    { 
+      "region": "South", 
+      "text": "Back pain mentions highest nationally; deploy targeted campaigns" 
+    },
+    { 
+      "region": "Midwest", 
+      "text": "Insurance questions up 15%; update FAQ templates" 
+    }
+  ]
+}

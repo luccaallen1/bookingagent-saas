@@ -1,0 +1,2397 @@
+"use client";
+
+import React, { useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import {
+  LayoutDashboard,
+  Bot,
+  Puzzle,
+  BarChart3,
+  Users,
+  Send,
+  Settings,
+  Building2,
+  Calendar,
+  Search,
+  Phone,
+  MessageCircle,
+  Instagram,
+  Link as LinkIcon,
+  Globe,
+  Mail,
+  ShieldCheck,
+  ChevronRight,
+  Download,
+  Plus,
+  Wand2,
+  BadgeCheck,
+  X,
+  TrendingUp,
+  Clock,
+  Target,
+  Lightbulb,
+  BookOpen,
+  Network,
+} from "lucide-react";
+
+// shadcn/ui components
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+// Recharts components
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
+
+// Chart colors
+const COLORS = ['#0ea5e9', '#8b5cf6', '#22c55e', '#f59e0b', '#ef4444', '#06b6d4'];
+
+// AI Agent
+import AIAgentChat from "@/components/AIAgentChat";
+
+// ————————————————————————————————————————————
+// Demo data (replace with live API later)
+// ————————————————————————————————————————————
+const interactions = [
+  { d: "Mon", v: 120 },
+  { d: "Tue", v: 180 },
+  { d: "Wed", v: 160 },
+  { d: "Thu", v: 220 },
+  { d: "Fri", v: 260 },
+  { d: "Sat", v: 140 },
+  { d: "Sun", v: 90 },
+];
+
+const bookingsByChannel = [
+  { c: "Web", v: 62 },
+  { c: "Voice", v: 41 },
+  { c: "Instagram", v: 23 },
+  { c: "Facebook", v: 17 },
+  { c: "WhatsApp", v: 12 },
+];
+
+const topFaqs = [
+  { q: "Do you take walk-ins?", n: 89 },
+  { q: "Price for initial eval?", n: 71 },
+  { q: "Weekend hours?", n: 56 },
+  { q: "Do you accept insurance?", n: 43 },
+];
+
+const leadsSeed = [
+  { 
+    id: 1,
+    name: "Jane Doe", 
+    email: "jane@example.com", 
+    phone: "+1 202-555-0123", 
+    score: 85, 
+    status: "Booked", 
+    last: "12:05",
+    intent: "Ready to Book",
+    source: "Website Chat",
+    sentiment: "positive",
+    nextAction: "Appointment tomorrow 2:30 PM",
+    conversationSnippet: "I've been having lower back pain for weeks now. Can I book an appointment for tomorrow afternoon?",
+    tags: ["Back Pain", "New Patient", "Urgent"]
+  },
+  { 
+    id: 2,
+    name: "John Smith", 
+    email: "john@example.com", 
+    phone: "+1 202-555-0144", 
+    score: 62, 
+    status: "Needs F/U", 
+    last: "11:44",
+    intent: "Price Shopping",
+    source: "Voice Call",
+    sentiment: "neutral",
+    nextAction: "Follow up with pricing info",
+    conversationSnippet: "What are your rates for adjustments? Do you accept insurance?",
+    tags: ["Price Inquiry", "Insurance"]
+  },
+  { 
+    id: 3,
+    name: "Maria Perez", 
+    email: "maria@example.com", 
+    phone: "+1 202-555-0198", 
+    score: 40, 
+    status: "New", 
+    last: "10:33",
+    intent: "Information Gathering",
+    source: "Instagram DM",
+    sentiment: "positive",
+    nextAction: "Send welcome email",
+    conversationSnippet: "Hi! I saw your post about neck pain relief. What services do you offer?",
+    tags: ["Neck Pain", "Social Media"]
+  },
+  { 
+    id: 4,
+    name: "Alex Kim", 
+    email: "alex@example.com", 
+    phone: "+1 202-555-0170", 
+    score: 77, 
+    status: "Warm", 
+    last: "09:51",
+    intent: "Scheduling",
+    source: "Website Chat",
+    sentiment: "positive",
+    nextAction: "Awaiting response on time slot",
+    conversationSnippet: "I'd like to schedule a consultation. Are you available this Friday?",
+    tags: ["Consultation", "Friday"]
+  },
+  {
+    id: 5,
+    name: "Sarah Johnson",
+    email: "sarah@example.com",
+    phone: "+1 202-555-0188",
+    score: 92,
+    status: "Booked",
+    last: "Yesterday",
+    intent: "Returning Patient",
+    source: "Voice Call",
+    sentiment: "positive",
+    nextAction: "Regular monthly adjustment",
+    conversationSnippet: "It's time for my monthly adjustment. Same time as usual works for me.",
+    tags: ["Regular", "Maintenance Care"]
+  }
+];
+
+const campaigns = [
+  { name: "Labor Day", type: "Email", segment: "Warm Leads", status: "Draft" },
+  { name: "New Service", type: "SMS", segment: "All Contacts", status: "Scheduled" },
+];
+
+const locations = [
+  { name: "Gadsden, AL", bookings: 124, conv: 17.4, rev: 3210, health: 4, alerts: 1 },
+  { name: "Huntsville, AL", bookings: 98, conv: 14.1, rev: 2540, health: 3, alerts: 0 },
+  { name: "Dothan, AL", bookings: 156, conv: 19.8, rev: 4020, health: 5, alerts: 3 },
+];
+
+// Conversation-derived topics → power AI outreach suggestions
+const conversationTopics = [
+  { topic: "Ankle pain", mentions: 7, audience: "Warm Leads", insight: "7 customers asked about ankle pain this week." },
+  { topic: "Lower back pain", mentions: 15, audience: "All Contacts", insight: "Lower back pain is the #1 symptom mentioned." },
+  { topic: "Weekend hours", mentions: 12, audience: "All Contacts", insight: "High interest in Saturday availability." },
+];
+
+// Helpers to craft drafts from a topic
+function craftEmailDraft(t: { topic: string; audience: string }) {
+  const noun = t.topic.toLowerCase();
+  const seg = t.audience === "Warm Leads" ? "warm" : "all";
+  return {
+    name: `${t.topic} – Education`,
+    type: "email",
+    segment: seg,
+    subject: `${t.topic}? Here's how chiropractic care can help`,
+    content:
+      `Hi {{first_name}},\n\nWe noticed many people in our community asked about ${noun}. Here's a quick guide from our clinicians:\n\n• Common causes of ${noun}\n• When to see a chiropractor\n• What to expect during your visit\n• Simple at‑home care tips\n\nIf you're dealing with ${noun}, we'd love to help. Book a consult here: {{booking_link}}\n\n— {{business_name}}\n{{business_phone}}`,
+  };
+}
+
+function craftBlogDraft(t: { topic: string }) {
+  return {
+    title: `${t.topic}: Causes, At‑Home Care & Chiropractic Treatment`,
+    markdown:
+`# ${t.topic}: Causes, At‑Home Care & Chiropractic Treatment\n\n**Estimated read time:** 4–5 minutes\n\n## What is ${t.topic.toLowerCase()}?\nBrief overview of anatomy and common triggers.\n\n## Common Causes\n- Overuse / sports strain\n- Poor mechanics or footwear\n- Previous injury or instability\n\n## When to See a Chiropractor\n- Pain persists beyond a few days\n- Swelling or reduced range of motion\n- Pain with weight bearing\n\n## How Chiropractic Care Can Help\n- Assessment: gait, alignment, mobility\n- Adjustments to restore joint function\n- Soft‑tissue therapy & rehab exercises\n\n## At‑Home Tips\n- RICE (rest/ice/compression/elevation) initially\n- Progressive loading & mobility drills\n- Supportive footwear, return‑to‑activity plan\n\n## Next Steps\nReady to feel better? [Book a visit]({{booking_link}}) or call {{business_phone}}.\n`,
+  };
+}
+
+// ————————————————————————————————————————————
+// UI Helpers
+// ————————————————————————————————————————————
+function KpiCard({ title, value, sub }: { title: string; value: string; sub?: string }) {
+  return (
+    <Card className="rounded-2xl shadow-sm">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm text-muted-foreground font-medium">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="text-2xl font-semibold tracking-tight">{value}</div>
+        {sub && <div className="text-xs text-muted-foreground mt-1">{sub}</div>}
+      </CardContent>
+    </Card>
+  );
+}
+
+function SectionTitle({ icon: Icon, title, desc }: any) {
+  return (
+    <div className="flex items-start justify-between gap-2">
+      <div className="flex items-center gap-2">
+        <div className="p-2 rounded-xl bg-muted"><Icon className="h-5 w-5" /></div>
+        <div>
+          <h2 className="text-lg font-semibold leading-tight">{title}</h2>
+          {desc && <p className="text-sm text-muted-foreground">{desc}</p>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ————————————————————————————————————————————
+// Screens
+// ————————————————————————————————————————————
+function Dashboard() {
+  const conv = 877;
+  const engaged = 542;
+  const bookings = 165;
+  const convRate = ((bookings / engaged) * 100).toFixed(1) + "%";
+  const revenue = "$4,860";
+  const voiceMin = "312";
+
+  return (
+    <div className="space-y-6">
+      <SectionTitle icon={LayoutDashboard} title="Overview" desc="Key metrics across all channels" />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-4">
+        <KpiCard title="Conversations" value={String(conv)} />
+        <KpiCard title="Engaged" value={String(engaged)} />
+        <KpiCard title="Bookings" value={String(bookings)} />
+        <KpiCard title="Conversion" value={convRate} />
+        <KpiCard title="Revenue" value={revenue} />
+        <KpiCard title="Voice minutes" value={voiceMin} />
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <Card className="rounded-2xl shadow-sm xl:col-span-2">
+          <CardHeader>
+            <CardTitle>Interactions (last 7 days)</CardTitle>
+          </CardHeader>
+          <CardContent className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={interactions} margin={{ left: 8, right: 8, top: 8, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="d" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="v" stroke="#0ea5e9" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl shadow-sm">
+          <CardHeader>
+            <CardTitle>Bookings by channel</CardTitle>
+          </CardHeader>
+          <CardContent className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={bookingsByChannel}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="c" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="v" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <Card className="rounded-2xl shadow-sm">
+          <CardHeader>
+            <CardTitle>Top FAQs</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {topFaqs.map((f, i) => (
+              <div key={i} className="flex items-center justify-between">
+                <div className="text-sm">{f.q}</div>
+                <Badge variant="secondary">{f.n}</Badge>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl shadow-sm xl:col-span-2">
+          <CardHeader>
+            <CardTitle>Tool success ratio</CardTitle>
+          </CardHeader>
+          <CardContent className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={[{ name: "Success", value: 86 }, { name: "Retry", value: 9 }, { name: "Fail", value: 5 }]} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80}>
+                  {[0, 1, 2].map((idx) => (
+                    <Cell key={idx} fill={COLORS[idx]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function BusinessDetails() {
+  const [step, setStep] = useState(1);
+  const [faqs, setFaqs] = useState([
+    { id: 1, question: "Do you take walk-ins?", answer: "Yes, subject to availability." }
+  ]);
+  const Next = () => setStep((s) => Math.min(4, s + 1));
+  const Back = () => setStep((s) => Math.max(1, s - 1));
+  
+  const addFaq = () => {
+    setFaqs([...faqs, { id: Date.now(), question: "", answer: "" }]);
+  };
+  
+  const updateFaq = (id: number, field: 'question' | 'answer', value: string) => {
+    setFaqs(faqs.map(faq => faq.id === id ? { ...faq, [field]: value } : faq));
+  };
+  
+  const removeFaq = (id: number) => {
+    setFaqs(faqs.filter(faq => faq.id !== id));
+  };
+
+  return (
+    <div className="space-y-6">
+      <SectionTitle icon={BadgeCheck} title="Business Details" desc="Configure your location in a few quick steps" />
+
+      <Card className="rounded-2xl shadow-sm">
+        <CardHeader className="pb-0">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span className={step >= 1 ? "font-semibold text-foreground" : ""}>1. Business</span>
+            <ChevronRight className="h-4 w-4" />
+            <span className={step >= 2 ? "font-semibold text-foreground" : ""}>2. Services</span>
+            <ChevronRight className="h-4 w-4" />
+            <span className={step >= 3 ? "font-semibold text-foreground" : ""}>3. Hours</span>
+            <ChevronRight className="h-4 w-4" />
+            <span className={step >= 4 ? "font-semibold text-foreground" : ""}>4. FAQs & Link</span>
+          </div>
+        </CardHeader>
+        <CardContent className="grid gap-6 pt-6">
+          {step === 1 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Business Name</Label>
+                <Input placeholder="The Joint Chiropractic – Gadsden" />
+              </div>
+              <div className="space-y-2">
+                <Label>Phone</Label>
+                <Input placeholder="(256) 935-1911" />
+              </div>
+              <div className="space-y-2">
+                <Label>Email</Label>
+                <Input placeholder="clinic22018@thejoint.com" />
+              </div>
+              <div className="space-y-2">
+                <Label>Timezone</Label>
+                <Select defaultValue="America/Chicago">
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select timezone" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="America/Chicago">America/Chicago</SelectItem>
+                    <SelectItem value="America/New_York">America/New_York</SelectItem>
+                    <SelectItem value="America/Los_Angeles">America/Los_Angeles</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="md:col-span-2 space-y-2">
+                <Label>Address</Label>
+                <Input placeholder="510 E Meighan Blvd a10, Gadsden, AL 35903" />
+              </div>
+              <div className="md:col-span-2 space-y-2">
+                <Label>Address Description</Label>
+                <Input placeholder="River Trace Shopping center near Ross and Hobby Lobby" />
+              </div>
+              <div className="space-y-2">
+                <Label>Starting Price ($)</Label>
+                <Input type="number" placeholder="29" />
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="grid gap-4">
+              {[{ name: "Chiropractic Adjustment", id: "svc_adj", price: 29 }, { name: "Initial Evaluation", id: "svc_eval", price: 49 }].map((s) => (
+                <Card key={s.id} className="rounded-xl">
+                  <CardContent className="grid grid-cols-1 md:grid-cols-4 gap-3 p-4">
+                    <div className="md:col-span-2 space-y-2">
+                      <Label>Service Name</Label>
+                      <Input defaultValue={s.name} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Duration (min)</Label>
+                      <Input type="number" defaultValue={30} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Price ($)</Label>
+                      <Input type="number" defaultValue={s.price} />
+                    </div>
+                    <div className="md:col-span-4 space-y-2">
+                      <Label>Description</Label>
+                      <Textarea placeholder="Add a short description..." />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+              <Button variant="secondary" className="w-fit"><Plus className="h-4 w-4 mr-2" /> Add service</Button>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="space-y-6">
+              {/* Service Selection */}
+              <div className="space-y-2">
+                <Label>Configure hours for:</Label>
+                <Select defaultValue="all">
+                  <SelectTrigger className="w-full md:w-64">
+                    <SelectValue placeholder="Select service" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Services</SelectItem>
+                    <SelectItem value="svc_adj">Chiropractic Adjustment</SelectItem>
+                    <SelectItem value="svc_eval">Initial Evaluation</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={() => {}}>
+                  Set Weekdays (Mon-Fri)
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => {}}>
+                  Set Weekend (Sat-Sun)
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => {}}>
+                  Copy Monday to Weekdays
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => {}}>
+                  Close All Days
+                </Button>
+              </div>
+
+              {/* Days Grid */}
+              <div className="space-y-4">
+                {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
+                  <Card key={day} className="rounded-lg">
+                    <CardContent className="p-4">
+                      <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                        {/* Day Name and Toggle */}
+                        <div className="flex items-center justify-between lg:justify-start gap-3 min-w-[140px]">
+                          <span className="font-medium">{day}</span>
+                          <Switch defaultChecked={day !== "Sunday"} />
+                        </div>
+
+                        {/* Time Selection */}
+                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:flex lg:items-center gap-3">
+                          <div className="flex items-center gap-2">
+                            <Label className="text-sm text-muted-foreground">Open:</Label>
+                            <Select defaultValue={day === "Sunday" ? "" : "9:00 AM"}>
+                              <SelectTrigger className="w-32">
+                                <SelectValue placeholder="Select" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {Array.from({ length: 48 }, (_, i) => {
+                                  const hour = Math.floor(i / 2);
+                                  const min = i % 2 === 0 ? "00" : "30";
+                                  const period = hour < 12 ? "AM" : "PM";
+                                  const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+                                  return (
+                                    <SelectItem key={i} value={`${displayHour}:${min} ${period}`}>
+                                      {`${displayHour}:${min} ${period}`}
+                                    </SelectItem>
+                                  );
+                                })}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Label className="text-sm text-muted-foreground">Close:</Label>
+                            <Select defaultValue={day === "Sunday" ? "" : day === "Saturday" ? "4:00 PM" : "7:00 PM"}>
+                              <SelectTrigger className="w-32">
+                                <SelectValue placeholder="Select" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {Array.from({ length: 48 }, (_, i) => {
+                                  const hour = Math.floor(i / 2);
+                                  const min = i % 2 === 0 ? "00" : "30";
+                                  const period = hour < 12 ? "AM" : "PM";
+                                  const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+                                  return (
+                                    <SelectItem key={i} value={`${displayHour}:${min} ${period}`}>
+                                      {`${displayHour}:${min} ${period}`}
+                                    </SelectItem>
+                                  );
+                                })}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {/* Break Time */}
+                          <div className="flex items-center gap-2">
+                            <Button variant="ghost" size="sm">
+                              <Plus className="h-4 w-4 mr-1" /> Add Break
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Current Status Preview */}
+              <Card className="rounded-lg bg-muted/30">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm">
+                      <span className="font-medium">Current Status: </span>
+                      <span className="text-muted-foreground">Based on these hours, you're currently </span>
+                      <Badge className="ml-1">Open</Badge>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Thursday, 2:30 PM
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {step === 4 && (
+            <div className="grid gap-4">
+              <div className="space-y-2">
+                <Label>Website Link</Label>
+                <p className="text-sm text-muted-foreground">Your main business website for customers to learn more about your services</p>
+                <div className="flex gap-2">
+                  <Input placeholder="https://www.thejoint.com/alabama/gadsden" />
+                  <Button variant="secondary"><LinkIcon className="h-4 w-4 mr-2" />Copy</Button>
+                  <Button><Globe className="h-4 w-4 mr-2" />Preview</Button>
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                  <Switch id="scrape" defaultChecked />
+                  <Label htmlFor="scrape" className="text-sm font-normal">Enable website scraping to keep business information synchronized</Label>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Booking Link</Label>
+                <p className="text-sm text-muted-foreground">Direct booking URL provided to customers who want to schedule appointments later</p>
+                <Input placeholder="https://book.thejoint.com/gadsden" />
+              </div>
+              <Separator />
+              <div className="space-y-4">
+                <Label>Frequently Asked Questions</Label>
+                {faqs.map((faq, index) => (
+                  <Card key={faq.id} className="rounded-lg">
+                    <CardContent className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-sm text-muted-foreground">Question {index + 1}</Label>
+                          <Input 
+                            value={faq.question}
+                            onChange={(e) => updateFaq(faq.id, 'question', e.target.value)}
+                            placeholder="Enter question..." 
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <Label className="text-sm text-muted-foreground">Answer</Label>
+                            {faqs.length > 1 && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeFaq(faq.id)}
+                                className="h-6 px-2 text-muted-foreground hover:text-destructive"
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            )}
+                          </div>
+                          <Input 
+                            value={faq.answer}
+                            onChange={(e) => updateFaq(faq.id, 'answer', e.target.value)}
+                            placeholder="Enter answer..." 
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+                <Button variant="secondary" className="w-fit" onClick={addFaq}>
+                  <Plus className="h-4 w-4 mr-2" /> Add FAQ
+                </Button>
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between pt-2">
+            <Button variant="ghost" onClick={Back} disabled={step === 1}>Back</Button>
+            {step < 4 ? (
+              <Button onClick={Next}>Continue</Button>
+            ) : (
+              <Button>Finish & Go to Dashboard</Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function Integrations() {
+  const [utmSource, setUtmSource] = useState("");
+  const [utmMedium, setUtmMedium] = useState("");
+  const [generatedLink, setGeneratedLink] = useState("");
+  const [savedLinks, setSavedLinks] = useState([
+    { id: 1, source: "facebook", medium: "social", link: "https://chiro-chat.com/l/thejoint-gadsden?UTM_source=facebook&UTM_medium=social", createdAt: "2024-08-28" },
+    { id: 2, source: "google", medium: "cpc", link: "https://chiro-chat.com/l/thejoint-gadsden?UTM_source=google&UTM_medium=cpc", createdAt: "2024-08-27" }
+  ]);
+  const businessName = "thejoint-gadsden"; // This would come from business settings
+
+  const generateChatLink = () => {
+    if (utmSource && utmMedium) {
+      const link = `https://chiro-chat.com/l/${businessName}?UTM_source=${encodeURIComponent(utmSource)}&UTM_medium=${encodeURIComponent(utmMedium)}`;
+      setGeneratedLink(link);
+      
+      // Add to saved links
+      const newLink = {
+        id: Date.now(),
+        source: utmSource,
+        medium: utmMedium,
+        link: link,
+        createdAt: new Date().toISOString().split('T')[0]
+      };
+      setSavedLinks([newLink, ...savedLinks]);
+      
+      // Clear form
+      setUtmSource("");
+      setUtmMedium("");
+    }
+  };
+
+  const copyToClipboard = (linkToCopy: string) => {
+    navigator.clipboard.writeText(linkToCopy);
+  };
+
+  const deleteLink = (id: number) => {
+    setSavedLinks(savedLinks.filter(link => link.id !== id));
+  };
+
+  return (
+    <div className="space-y-6">
+      <SectionTitle icon={Puzzle} title="Integrations" desc="Connect voice, web, and social channels" />
+      {/* Chat Link Generator */}
+      <Card className="rounded-2xl shadow-sm">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2"><MessageCircle className="h-5 w-5" /> Chat Link Generator</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="text-sm text-muted-foreground">Generate trackable chat links with UTM parameters for different marketing channels.</div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label>UTM Source</Label>
+              <Input 
+                placeholder="e.g., facebook, google, newsletter"
+                value={utmSource}
+                onChange={(e) => setUtmSource(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>UTM Medium</Label>
+              <Input 
+                placeholder="e.g., social, cpc, email"
+                value={utmMedium}
+                onChange={(e) => setUtmMedium(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <Button 
+            onClick={generateChatLink} 
+            disabled={!utmSource || !utmMedium}
+            className="w-full"
+          >
+            <Wand2 className="h-4 w-4 mr-2" />
+            Generate Chat Link
+          </Button>
+
+          {generatedLink && (
+            <div className="space-y-2">
+              <Label>Generated Link</Label>
+              <div className="flex gap-2">
+                <Input 
+                  readOnly 
+                  value={generatedLink}
+                  className="font-mono text-xs"
+                />
+                <Button variant="secondary" onClick={() => copyToClipboard(generatedLink)}>
+                  <LinkIcon className="h-4 w-4 mr-2" />
+                  Copy
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Saved Chat Links */}
+      <Card className="rounded-2xl shadow-sm">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Saved Chat Links</CardTitle>
+            <Badge variant="secondary">{savedLinks.length} links</Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {savedLinks.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No chat links generated yet. Create your first link above.
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>UTM Source</TableHead>
+                  <TableHead>UTM Medium</TableHead>
+                  <TableHead>Link</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableHead className="w-[100px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {savedLinks.map((savedLink) => (
+                  <TableRow key={savedLink.id}>
+                    <TableCell>
+                      <Badge variant="outline" className="text-xs">
+                        {savedLink.source}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary" className="text-xs">
+                        {savedLink.medium}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-mono text-xs text-muted-foreground truncate max-w-[300px]">
+                        {savedLink.link}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm text-muted-foreground">
+                        {savedLink.createdAt}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          onClick={() => copyToClipboard(savedLink.link)}
+                          className="h-7 px-2"
+                        >
+                          <LinkIcon className="h-3 w-3" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          onClick={() => deleteLink(savedLink.id)}
+                          className="h-7 px-2 text-muted-foreground hover:text-destructive"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+        <Card className="rounded-2xl shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><Phone className="h-5 w-5" /> Voice Bot</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="text-sm text-muted-foreground">Provision a number or port an existing line. Configure greeting, fallbacks, and transfer rules.</div>
+            <div className="flex items-center gap-3">
+              <Button>Connect</Button>
+              <Button variant="secondary">Configure</Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><Globe className="h-5 w-5" /> Website Chat Widget</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="bg-muted rounded-xl p-3 text-xs font-mono overflow-auto">{"<script src=\"https://cdn.mybrand.com/agent.js\" data-business=\"loc_104\"></script>"}</div>
+            <div className="flex items-center gap-3">
+              <Button variant="secondary"><Download className="h-4 w-4 mr-2" />Copy Script</Button>
+              <Button>Customize</Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><Calendar className="h-5 w-5" /> Google Calendar</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="text-sm text-muted-foreground">Status: <Badge variant="outline">Not connected</Badge></div>
+            <Button>Connect Google Calendar</Button>
+            <div className="text-xs text-muted-foreground">Scopes: freebusy.read, events</div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><Instagram className="h-5 w-5" /> Instagram DM</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button>Connect</Button>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><MessageCircle className="h-5 w-5" /> Facebook Messenger</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button>Connect</Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function Insights() {
+  return (
+    <div className="space-y-6">
+      <SectionTitle icon={BarChart3} title="Insights" desc="Performance analytics & trends" />
+      <Dashboard />
+      <Card className="rounded-2xl shadow-sm">
+        <CardHeader>
+          <CardTitle>Conversation log</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Input placeholder="Search conversations..." className="max-w-sm" />
+            <Select defaultValue="all">
+              <SelectTrigger className="w-40"><SelectValue placeholder="Channel" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All channels</SelectItem>
+                <SelectItem value="web">Web</SelectItem>
+                <SelectItem value="voice">Voice</SelectItem>
+                <SelectItem value="ig">Instagram</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID</TableHead>
+                <TableHead>Channel</TableHead>
+                <TableHead>Result</TableHead>
+                <TableHead>Time</TableHead>
+                <TableHead>Snippet</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <TableRow key={i} className="hover:bg-muted/40 cursor-pointer">
+                  <TableCell>#{10230 + i}</TableCell>
+                  <TableCell>{i % 2 ? "Web" : "Voice"}</TableCell>
+                  <TableCell>
+                    <Badge variant={i % 3 === 0 ? "secondary" : "default"}>{i % 3 === 0 ? "Lead" : "Booked"}</Badge>
+                  </TableCell>
+                  <TableCell>12:{10 + i}</TableCell>
+                  <TableCell className="truncate max-w-[360px]">"I'd like to book tomorrow around 2:30 if possible…"</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function Leads() {
+  const [q, setQ] = useState("");
+  const [open, setOpen] = useState(false);
+  const [conversationOpen, setConversationOpen] = useState(false);
+  const [lead, setLead] = useState<any>(null);
+  const [selectedView, setSelectedView] = useState<"grid" | "list">("grid");
+  const [filterIntent, setFilterIntent] = useState("all");
+  const [filterSource, setFilterSource] = useState("all");
+
+  const filtered = useMemo(() => {
+    return leadsSeed.filter((l) => {
+      if (!l) return false;
+      
+      const matchesSearch = (l.name || "").toLowerCase().includes(q.toLowerCase()) || 
+                           (l.email || "").includes(q) || 
+                           (l.conversationSnippet || "").toLowerCase().includes(q.toLowerCase());
+      const matchesIntent = filterIntent === "all" || l.intent === filterIntent;
+      const matchesSource = filterSource === "all" || l.source === filterSource;
+      return matchesSearch && matchesIntent && matchesSource;
+    });
+  }, [q, filterIntent, filterSource]);
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return "text-green-600 bg-green-50";
+    if (score >= 60) return "text-yellow-600 bg-yellow-50";
+    return "text-red-600 bg-red-50";
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Booked": return "default";
+      case "Warm": return "secondary";
+      case "Needs F/U": return "outline";
+      default: return "secondary";
+    }
+  };
+
+  const getSentimentIcon = (sentiment: string) => {
+    switch (sentiment) {
+      case "positive": return "😊";
+      case "neutral": return "😐";
+      case "negative": return "😟";
+      default: return "😐";
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <SectionTitle icon={Users} title="Lead Management" desc="Track conversations, understand intent, and convert leads" />
+
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="rounded-xl">
+          <CardContent className="p-4">
+            <div className="text-sm text-muted-foreground">Total Leads</div>
+            <div className="text-2xl font-bold">{leadsSeed.length}</div>
+            <div className="text-xs text-green-600">+3 today</div>
+          </CardContent>
+        </Card>
+        <Card className="rounded-xl">
+          <CardContent className="p-4">
+            <div className="text-sm text-muted-foreground">Ready to Book</div>
+            <div className="text-2xl font-bold">2</div>
+            <div className="text-xs text-muted-foreground">High intent</div>
+          </CardContent>
+        </Card>
+        <Card className="rounded-xl">
+          <CardContent className="p-4">
+            <div className="text-sm text-muted-foreground">Needs Follow-up</div>
+            <div className="text-2xl font-bold">1</div>
+            <div className="text-xs text-yellow-600">Action required</div>
+          </CardContent>
+        </Card>
+        <Card className="rounded-xl">
+          <CardContent className="p-4">
+            <div className="text-sm text-muted-foreground">Avg Lead Score</div>
+            <div className="text-2xl font-bold">71</div>
+            <div className="text-xs text-muted-foreground">Good quality</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters and Search */}
+      <Card className="rounded-2xl shadow-sm">
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <CardTitle>Lead Pipeline</CardTitle>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  value={q} 
+                  onChange={(e) => setQ(e.target.value)} 
+                  placeholder="Search leads, conversations..." 
+                  className="pl-9 w-64" 
+                />
+              </div>
+              <Select value={filterIntent} onValueChange={setFilterIntent}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Intent" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Intents</SelectItem>
+                  <SelectItem value="Ready to Book">Ready to Book</SelectItem>
+                  <SelectItem value="Price Shopping">Price Shopping</SelectItem>
+                  <SelectItem value="Information Gathering">Info Gathering</SelectItem>
+                  <SelectItem value="Scheduling">Scheduling</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={filterSource} onValueChange={setFilterSource}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Source" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Sources</SelectItem>
+                  <SelectItem value="Website Chat">Website Chat</SelectItem>
+                  <SelectItem value="Voice Call">Voice Call</SelectItem>
+                  <SelectItem value="Instagram DM">Instagram</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button variant="secondary"><Download className="h-4 w-4 mr-2" /> Export</Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {/* Lead Table */}
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Lead</TableHead>
+                <TableHead>Contact</TableHead>
+                <TableHead>Intent</TableHead>
+                <TableHead>Source</TableHead>
+                <TableHead>Score</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Last Activity</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((lead) => (
+                <TableRow 
+                  key={lead.id} 
+                  className="hover:bg-muted/40 cursor-pointer" 
+                  onClick={() => { 
+                    try {
+                      setLead(lead); 
+                      setOpen(true); 
+                    } catch (error) {
+                      console.error('Error opening lead dialog:', error);
+                    }
+                  }}
+                >
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className={getScoreColor(lead.score || 0)}>
+                          {lead.score || 0}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium flex items-center gap-2">
+                          {lead.name || "Unknown"}
+                          <span className="text-sm">{getSentimentIcon(lead.sentiment || "neutral")}</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate max-w-[200px]">
+                          "{lead.conversationSnippet || "No message"}"
+                        </div>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div className="text-sm">{lead.email || "No email"}</div>
+                      <div className="text-xs text-muted-foreground">{lead.phone || "No phone"}</div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="text-xs">
+                      {lead.intent || "Unknown"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary" className="text-xs">
+                      {lead.source || "Unknown"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className={`inline-flex items-center justify-center w-12 h-6 rounded text-xs font-medium ${getScoreColor(lead.score || 0)}`}>
+                      {lead.score || 0}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={getStatusColor(lead.status || "New") as any}>
+                      {lead.status || "New"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm">{lead.last || "Unknown"}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setLead(lead);
+                          setConversationOpen(true);
+                        }}
+                        className="h-7 px-2"
+                      >
+                        <MessageCircle className="h-3 w-3" />
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Handle phone call
+                        }}
+                        className="h-7 px-2"
+                      >
+                        <Phone className="h-3 w-3" />
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Handle email
+                        }}
+                        className="h-7 px-2"
+                      >
+                        <Mail className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Lead Detail Dialog */}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-2xl rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>Lead Profile</DialogTitle>
+          </DialogHeader>
+          {lead && (
+            <div className="space-y-6">
+              {/* Lead Header - Same as card design */}
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-12 w-12">
+                    <AvatarFallback className={getScoreColor(lead.score || 0)}>
+                      {lead.score || 0}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="font-semibold text-lg flex items-center gap-2">
+                      {lead.name || "Unknown Lead"}
+                      <span className="text-xl">{getSentimentIcon(lead.sentiment || "neutral")}</span>
+                    </div>
+                    <div className="text-sm text-muted-foreground flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs px-1.5 py-0">
+                        {lead.source || "Unknown"}
+                      </Badge>
+                      <span>{lead.last || "Unknown"}</span>
+                    </div>
+                  </div>
+                </div>
+                <Badge variant={getStatusColor(lead.status || "New") as any} className="text-sm px-3 py-1">
+                  {lead.status || "New"}
+                </Badge>
+              </div>
+
+              {/* Contact Info */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-3 border rounded-lg">
+                  <div className="text-xs text-muted-foreground mb-1">Email</div>
+                  <div className="font-medium">{lead.email || "Not provided"}</div>
+                </div>
+                <div className="p-3 border rounded-lg">
+                  <div className="text-xs text-muted-foreground mb-1">Phone</div>
+                  <div className="font-medium">{lead.phone || "Not provided"}</div>
+                </div>
+              </div>
+
+              {/* Intent */}
+              {lead.intent && (
+                <div className="p-3 rounded-lg bg-muted/50">
+                  <div className="text-xs font-medium text-muted-foreground mb-1">Intent</div>
+                  <div className="text-lg font-medium">{lead.intent}</div>
+                </div>
+              )}
+
+              {/* Conversation Snippet */}
+              {lead.conversationSnippet && (
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground mb-2">Last Message</div>
+                  <div className="p-3 bg-muted/30 rounded-lg italic text-sm">
+                    "{lead.conversationSnippet}"
+                  </div>
+                </div>
+              )}
+
+              {/* Tags */}
+              {lead.tags && Array.isArray(lead.tags) && lead.tags.length > 0 && (
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground mb-2">Tags</div>
+                  <div className="flex flex-wrap gap-2">
+                    {lead.tags.map((tag: string, i: number) => (
+                      <Badge key={i} variant="secondary" className="text-sm px-3 py-1">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Next Action */}
+              {lead.nextAction && (
+                <div className="p-3 rounded-lg border border-dashed">
+                  <div className="text-sm font-medium text-muted-foreground mb-1">Next Action</div>
+                  <div className="text-sm">{lead.nextAction}</div>
+                </div>
+              )}
+
+              {/* Notes */}
+              <div className="space-y-2">
+                <Label>Notes</Label>
+                <Textarea placeholder="Add notes about this lead..." className="min-h-[80px]" />
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => {
+                    setOpen(false);
+                    setConversationOpen(true);
+                  }}
+                >
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  View Full Conversation
+                </Button>
+                <Button variant="outline" className="flex-1">
+                  <Phone className="h-4 w-4 mr-2" />
+                  Call Now
+                </Button>
+                <Button className="flex-1">
+                  <Mail className="h-4 w-4 mr-2" />
+                  Send Email
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Conversation Viewer Dialog */}
+      <Dialog open={conversationOpen} onOpenChange={setConversationOpen}>
+        <DialogContent className="sm:max-w-2xl rounded-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Conversation History</DialogTitle>
+          </DialogHeader>
+          {lead && (
+            <div className="space-y-4">
+              {/* Lead Info */}
+              <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback>{lead.name ? lead.name.split(" ").map((p: string) => p[0]).join("") : "??"}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="font-medium">{lead.name || "Unknown"}</div>
+                    <div className="text-sm text-muted-foreground">{lead.source || "Unknown"} • {lead.last || "Unknown"}</div>
+                  </div>
+                </div>
+                <Badge>{lead.intent || "Unknown"}</Badge>
+              </div>
+
+              {/* Conversation Messages */}
+              <ScrollArea className="h-[400px] p-4 border rounded-lg">
+                <div className="space-y-4">
+                  <div className="flex gap-3">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>{lead.name ? lead.name.split(" ").map((p: string) => p[0]).join("") : "??"}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="bg-muted rounded-lg p-3">
+                        <p className="text-sm">{lead.conversationSnippet || "No message available"}</p>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">2:30 PM</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3 flex-row-reverse">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>AI</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="bg-primary text-primary-foreground rounded-lg p-3">
+                        <p className="text-sm">I'd be happy to help you schedule an appointment! I have availability tomorrow at 2:30 PM or 3:30 PM. Which time works better for you?</p>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1 text-right">2:31 PM</div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>{lead.name ? lead.name.split(" ").map((p: string) => p[0]).join("") : "??"}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="bg-muted rounded-lg p-3">
+                        <p className="text-sm">2:30 PM would be perfect. Do I need to bring anything?</p>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">2:32 PM</div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 flex-row-reverse">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>AI</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="bg-primary text-primary-foreground rounded-lg p-3">
+                        <p className="text-sm">Great! I've booked you for tomorrow at 2:30 PM. Please bring your ID and insurance card if you have one. We'll send you a confirmation email shortly with all the details.</p>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1 text-right">2:33 PM</div>
+                    </div>
+                  </div>
+                </div>
+              </ScrollArea>
+
+              {/* Conversation Analysis */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 border rounded-lg">
+                  <div className="text-xs text-muted-foreground">Sentiment</div>
+                  <div className="font-medium">{getSentimentIcon(lead.sentiment || "neutral")} {lead.sentiment || "neutral"}</div>
+                </div>
+                <div className="p-3 border rounded-lg">
+                  <div className="text-xs text-muted-foreground">Lead Score</div>
+                  <div className="font-medium">{lead.score || 0}/100</div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-2">
+                <Button variant="outline" className="flex-1">
+                  <Mail className="h-4 w-4 mr-2" /> Send Follow-up
+                </Button>
+                <Button className="flex-1">
+                  <Phone className="h-4 w-4 mr-2" /> Call Now
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function Outreach() {
+  const [open, setOpen] = useState(false); // campaign dialog
+  const [blogOpen, setBlogOpen] = useState(false); // blog dialog
+
+  const [campaignDraft, setCampaignDraft] = useState({
+    name: "Community Health – Topic",
+    type: "email",
+    segment: "warm",
+    subject: "Health tip from our clinicians",
+    content: "",
+  });
+
+  const [blogDraft, setBlogDraft] = useState<{ title: string; markdown: string }>({ title: "", markdown: "" });
+
+  const startEmailFromTopic = (t: any) => {
+    const d = craftEmailDraft(t);
+    setCampaignDraft({
+      name: d.name,
+      type: d.type,
+      segment: d.segment,
+      subject: d.subject,
+      content: d.content,
+    });
+    setOpen(true);
+  };
+
+  const startBlogFromTopic = (t: any) => {
+    const d = craftBlogDraft(t);
+    setBlogDraft(d);
+    setBlogOpen(true);
+  };
+
+  return (
+    <div className="space-y-6">
+      <SectionTitle icon={Send} title="Outreach" desc="Email & SMS campaigns with AI assist and conversation insights" />
+
+      {/* AI Suggestions from Conversations */}
+      <Card className="rounded-2xl shadow-sm">
+        <CardHeader>
+          <CardTitle>AI Suggestions from Conversations</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Topic</TableHead>
+                <TableHead>Mentions</TableHead>
+                <TableHead>Insight</TableHead>
+                <TableHead>Recommended Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {conversationTopics.map((t, i) => (
+                <TableRow key={i}>
+                  <TableCell className="font-medium">{t.topic}</TableCell>
+                  <TableCell><Badge variant="secondary">{t.mentions}</Badge></TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{t.insight}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Button size="sm" onClick={() => startEmailFromTopic(t)}>Draft Email</Button>
+                      <Button size="sm" variant="secondary" onClick={() => startBlogFromTopic(t)}>Draft Blog</Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Campaigns list */}
+      <Card className="rounded-2xl shadow-sm">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Campaigns</CardTitle>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button><Plus className="h-4 w-4 mr-2" /> New Campaign</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-2xl rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle>Create Campaign</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Name</Label>
+                      <Input value={campaignDraft.name} onChange={(e) => setCampaignDraft({ ...campaignDraft, name: e.target.value })} />
+                    </div>
+                    <div>
+                      <Label>Type</Label>
+                      <Select value={campaignDraft.type} onValueChange={(v) => setCampaignDraft({ ...campaignDraft, type: v })}>
+                        <SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="email">Email</SelectItem>
+                          <SelectItem value="sms">SMS</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Segment</Label>
+                      <Select value={campaignDraft.segment} onValueChange={(v) => setCampaignDraft({ ...campaignDraft, segment: v })}>
+                        <SelectTrigger><SelectValue placeholder="Segment" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="warm">Warm Leads</SelectItem>
+                          <SelectItem value="all">All Contacts</SelectItem>
+                          <SelectItem value="booked">Booked</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Send Time</Label>
+                      <Select defaultValue="schedule">
+                        <SelectTrigger><SelectValue placeholder="Send time" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="now">Send now</SelectItem>
+                          <SelectItem value="schedule">Schedule…</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div>
+                    <Label>Subject</Label>
+                    <Input value={campaignDraft.subject} onChange={(e) => setCampaignDraft({ ...campaignDraft, subject: e.target.value })} />
+                  </div>
+                  <div>
+                    <Label>Content (AI Assist)</Label>
+                    <div className="flex gap-2 mb-2">
+                      <Button variant="secondary" onClick={() => setCampaignDraft({ ...campaignDraft, content: campaignDraft.content || "Quick reminder to {{audience}} with {{booking_link}}" })}><Wand2 className="h-4 w-4 mr-2" /> Generate Copy</Button>
+                      <Button variant="secondary" onClick={() => setCampaignDraft({ ...campaignDraft, content: (campaignDraft.content || "") + "\n\nBook now: {{booking_link}}" })}><LinkIcon className="h-4 w-4 mr-2" /> Insert Booking Link</Button>
+                    </div>
+                    <Textarea rows={8} value={campaignDraft.content} onChange={(e) => setCampaignDraft({ ...campaignDraft, content: e.target.value })} placeholder="Write your message…" />
+                  </div>
+                  <div className="flex items-center justify-end gap-2">
+                    <Button variant="secondary">Send Test</Button>
+                    <Button>Schedule</Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Segment</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {campaigns.map((c, i) => (
+                <TableRow key={i}>
+                  <TableCell className="font-medium">{c.name}</TableCell>
+                  <TableCell>{c.type}</TableCell>
+                  <TableCell>{c.segment}</TableCell>
+                  <TableCell><Badge variant={c.status === "Scheduled" ? "default" : "secondary"}>{c.status}</Badge></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Campaign results */}
+      <Card className="rounded-2xl shadow-sm">
+        <CardHeader>
+          <CardTitle>Recent Campaign Results</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <KpiCard title="Opens" value="41%" />
+          <KpiCard title="Clicks" value="18%" />
+          <KpiCard title="Bookings" value="54" />
+        </CardContent>
+      </Card>
+
+      {/* Blog draft dialog */}
+      <Dialog open={blogOpen} onOpenChange={setBlogOpen}>
+        <DialogContent className="sm:max-w-2xl rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>Blog Draft</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-3">
+            <Label>Title</Label>
+            <Input value={blogDraft.title} onChange={(e) => setBlogDraft({ ...blogDraft, title: e.target.value })} />
+            <Label>Markdown</Label>
+            <Textarea rows={12} value={blogDraft.markdown} onChange={(e) => setBlogDraft({ ...blogDraft, markdown: e.target.value })} />
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function SettingsScreen() {
+  return (
+    <div className="space-y-6">
+      <SectionTitle icon={Settings} title="Settings" desc="Team, branding, billing, and API" />
+      <Tabs defaultValue="team" className="w-full">
+        <TabsList className="grid grid-cols-4 w-full">
+          <TabsTrigger value="team">Team & Roles</TabsTrigger>
+          <TabsTrigger value="branding">Branding</TabsTrigger>
+          <TabsTrigger value="billing">Billing</TabsTrigger>
+          <TabsTrigger value="api">API Keys</TabsTrigger>
+        </TabsList>
+        <TabsContent value="team" className="mt-4">
+          <Card className="rounded-2xl shadow-sm">
+            <CardHeader><CardTitle>Team</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Avatar><AvatarFallback>LA</AvatarFallback></Avatar>
+                  <div>
+                    <div className="font-medium">Lucca Allen</div>
+                    <div className="text-sm text-muted-foreground">Owner</div>
+                  </div>
+                </div>
+                <Badge>Owner</Badge>
+              </div>
+              <Separator />
+              <div className="flex items-center gap-2">
+                <Input placeholder="teammate@example.com" />
+                <Select defaultValue="manager">
+                  <SelectTrigger className="w-40"><SelectValue placeholder="Role" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="manager">Manager</SelectItem>
+                    <SelectItem value="staff">Staff</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button>Invite</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="branding" className="mt-4">
+          <Card className="rounded-2xl shadow-sm">
+            <CardHeader><CardTitle>Branding</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-2">
+                <Label>Logo</Label>
+                <Input type="file" />
+              </div>
+              <div>
+                <Label>Primary color</Label>
+                <Input type="color" defaultValue="#0ea5e9" />
+              </div>
+              <div>
+                <Label>Accent color</Label>
+                <Input type="color" defaultValue="#22c55e" />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="billing" className="mt-4">
+          <Card className="rounded-2xl shadow-sm">
+            <CardHeader><CardTitle>Billing</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label>Plan</Label>
+                <Select defaultValue="pro">
+                  <SelectTrigger><SelectValue placeholder="Plan" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="basic">Basic</SelectItem>
+                    <SelectItem value="pro">Pro</SelectItem>
+                    <SelectItem value="enterprise">Enterprise</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Locations</Label>
+                <Input type="number" defaultValue={3} />
+              </div>
+              <div className="flex items-end">
+                <Button>Update</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="api" className="mt-4">
+          <Card className="rounded-2xl shadow-sm">
+            <CardHeader><CardTitle>API Keys & Webhooks</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Input readOnly value="sk_live_****************" />
+                <Button variant="secondary">Generate New</Button>
+              </div>
+              <div>
+                <Label>Webhook URL</Label>
+                <Input placeholder="https://hooks.mybrand.com/ingest" />
+              </div>
+              <div className="flex items-center gap-2"><Switch id="redact" /><Label htmlFor="redact">Enable transcript PII redaction</Label></div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+function Utilization() {
+  const [localInsights, setLocalInsights] = useState<any[]>([]);
+  const [networkInsights, setNetworkInsights] = useState<any[]>([]);
+  const [generalInsights, setGeneralInsights] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("local");
+
+  // Fetch insights from APIs
+  React.useEffect(() => {
+    const fetchInsights = async () => {
+      setLoading(true);
+      try {
+        const [localRes, networkRes, generalRes] = await Promise.all([
+          fetch('/api/insights/local'),
+          fetch('/api/insights/network'), 
+          fetch('/api/insights/general')
+        ]);
+
+        const localData = await localRes.json();
+        const networkData = await networkRes.json();
+        const generalData = await generalRes.json();
+
+        if (localData.success) setLocalInsights(localData.data);
+        if (networkData.success) setNetworkInsights(networkData.data);
+        if (generalData.success) setGeneralInsights(generalData.data);
+      } catch (error) {
+        console.error('Failed to fetch insights:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInsights();
+  }, []);
+
+  // Telemetry tracking
+  const trackInsightClick = async (insight: any, actionType: string) => {
+    try {
+      await fetch('/api/telemetry/insight-clicked', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          insightId: insight.id,
+          locationId: 'clinic_gadsden_001', // Would come from auth context
+          actionType: actionType,
+          timestamp: new Date().toISOString()
+        })
+      });
+    } catch (error) {
+      console.error('Telemetry failed:', error);
+    }
+  };
+
+  // Handle CTA clicks with telemetry and navigation
+  const handleActionClick = (insight: any) => {
+    trackInsightClick(insight, insight.actionType);
+    
+    // Route to appropriate action
+    switch (insight.actionType) {
+      case 'campaign':
+        // Navigate to outreach with pre-filled template
+        window.location.href = insight.actionTarget;
+        break;
+      case 'settings':
+        // Navigate to configuration page
+        window.location.href = insight.actionTarget;
+        break;
+      case 'playbook':
+        // Open playbook/guide
+        window.location.href = insight.actionTarget;
+        break;
+      default:
+        console.log('Unknown action type:', insight.actionType);
+    }
+  };
+
+  const getActionLabel = (actionType: string) => {
+    switch (actionType) {
+      case 'campaign': return 'Create Campaign';
+      case 'settings': return 'Update Settings';
+      case 'playbook': return 'View Guide';
+      default: return 'Take Action';
+    }
+  };
+
+  const getActionIcon = (actionType: string) => {
+    switch (actionType) {
+      case 'campaign': return Send;
+      case 'settings': return Settings;
+      case 'playbook': return BookOpen;
+      default: return Target;
+    }
+  };
+
+  const playbooks = [
+    { title: "How to embed chat link in IG Story", category: "Social Media", readTime: "2 min", steps: 5 },
+    { title: "Add referral link to email footer", category: "Email Marketing", readTime: "3 min", steps: 4 },
+    { title: "Set up weekend booking slots", category: "Scheduling", readTime: "5 min", steps: 7 },
+    { title: "Create symptom-specific FAQs", category: "Content", readTime: "4 min", steps: 6 }
+  ];
+
+  const getImpactColor = (impact: string) => {
+    switch (impact) {
+      case "High": return "text-green-600 bg-green-50";
+      case "Medium": return "text-yellow-600 bg-yellow-50";
+      case "Low": return "text-gray-600 bg-gray-50";
+      default: return "text-gray-600 bg-gray-50";
+    }
+  };
+
+  const getUrgencyColor = (urgency: string) => {
+    switch (urgency) {
+      case "high": return "text-red-600 bg-red-50";
+      case "medium": return "text-yellow-600 bg-yellow-50";
+      case "low": return "text-green-600 bg-green-50";
+      default: return "text-gray-600 bg-gray-50";
+    }
+  };
+
+  // Chart data for visualizations
+  const localChartData = {
+    inquiryTrends: [
+      { condition: "Back Pain", count: 124, change: 18 },
+      { condition: "Neck Pain", count: 89, change: 3 },
+      { condition: "Ankle Pain", count: 67, change: 45 },
+      { condition: "Shoulder Pain", count: 52, change: -8 }
+    ],
+    conversionFunnel: [
+      { stage: "Inquiries", count: 342, percentage: 100 },
+      { stage: "Engaged", count: 248, percentage: 72 },
+      { stage: "Qualified", count: 186, percentage: 54 },
+      { stage: "Booked", count: 124, percentage: 36 }
+    ],
+    timeSlotUtilization: [
+      { time: "9-11 AM", utilization: 87, bookings: 23 },
+      { time: "11-1 PM", utilization: 65, bookings: 17 },
+      { time: "1-3 PM", utilization: 72, bookings: 19 },
+      { time: "3-5 PM", utilization: 58, bookings: 15 },
+      { time: "5-7 PM", utilization: 45, bookings: 12 }
+    ]
+  };
+
+  const networkChartData = {
+    performanceComparison: [
+      { metric: "Conversion Rate", yourClinic: 36, networkAvg: 42 },
+      { metric: "Avg Response Time", yourClinic: 12, networkAvg: 8 },
+      { metric: "Weekend Bookings", yourClinic: 15, networkAvg: 23 },
+      { metric: "Social Engagement", yourClinic: 28, networkAvg: 45 }
+    ],
+    tacticsAdoption: [
+      { tactic: "IG Bio Links", adopted: 67, total: 89 },
+      { tactic: "Weekend Slots", adopted: 45, total: 89 },
+      { tactic: "Pricing in FAQs", adopted: 78, total: 89 },
+      { tactic: "Email Campaigns", adopted: 34, total: 89 }
+    ]
+  };
+
+  const generalChartData = {
+    industryBenchmarks: [
+      { category: "Website Optimization", avgImprovement: 30 },
+      { category: "Content Strategy", avgImprovement: 23 },
+      { category: "Social Media", avgImprovement: 40 },
+      { category: "Patient Retention", avgImprovement: 15 }
+    ],
+    tacticsByImpact: [
+      { name: "High Impact", value: 45, color: "#22c55e" },
+      { name: "Medium Impact", value: 35, color: "#f59e0b" },
+      { name: "Low Impact", value: 20, color: "#6b7280" }
+    ]
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <SectionTitle icon={BarChart3} title="Utilization" desc="Loading insights..." />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {[1,2,3,4].map(i => (
+            <Card key={i} className="rounded-2xl shadow-sm">
+              <CardContent className="p-4">
+                <div className="space-y-3">
+                  <div className="h-4 bg-muted rounded animate-pulse" />
+                  <div className="h-3 bg-muted rounded w-3/4 animate-pulse" />
+                  <div className="h-8 bg-muted rounded animate-pulse" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <SectionTitle icon={BarChart3} title="Utilization" desc="Data-driven insights with analytics" />
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-3 w-full max-w-md">
+          <TabsTrigger value="local">Your Clinic</TabsTrigger>
+          <TabsTrigger value="network">Network</TabsTrigger>
+          <TabsTrigger value="industry">Industry</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="local" className="space-y-6 mt-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Target className="h-5 w-5 text-blue-600" />
+            <h3 className="text-lg font-semibold">Your Clinic Insights</h3>
+            <Badge variant="secondary" className="text-xs">Based on your data</Badge>
+          </div>
+
+          {/* Charts Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+            <Card className="rounded-2xl shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-sm">Inquiry Trends</CardTitle>
+              </CardHeader>
+              <CardContent className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={localChartData.inquiryTrends}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="condition" fontSize={10} />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-2xl shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-sm">Conversion Funnel</CardTitle>
+              </CardHeader>
+              <CardContent className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={localChartData.conversionFunnel} layout="horizontal">
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis type="category" dataKey="stage" fontSize={10} />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#22c55e" radius={[0, 4, 4, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-2xl shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-sm">Time Slot Utilization</CardTitle>
+              </CardHeader>
+              <CardContent className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={localChartData.timeSlotUtilization}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="time" fontSize={10} />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="utilization" stroke="#f59e0b" strokeWidth={2} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Insights Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {localInsights.map((insight) => {
+              const ActionIcon = getActionIcon(insight.actionType);
+              return (
+                <Card key={insight.id} className="rounded-2xl shadow-sm">
+                  <CardContent className="p-4">
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 rounded-xl bg-muted">
+                          <Target className="h-5 w-5" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium">{insight.title}</div>
+                          <div className="text-sm text-muted-foreground mt-1">{insight.metric}</div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className={`text-xs ${getImpactColor(insight.impact)}`}>
+                            {insight.impact}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {insight.effort} effort
+                          </Badge>
+                          {insight.urgent && <Badge variant="destructive" className="text-xs">Urgent</Badge>}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="text-sm text-muted-foreground">
+                          <strong>Category:</strong> {insight.category}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          Source: {insight.dataSource}
+                        </div>
+                      </div>
+
+                      <Button 
+                        size="sm" 
+                        className="w-fit"
+                        onClick={() => handleActionClick(insight)}
+                      >
+                        <ActionIcon className="h-3 w-3 mr-2" />
+                        {getActionLabel(insight.actionType)}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="network" className="space-y-6 mt-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Network className="h-5 w-5 text-purple-600" />
+            <h3 className="text-lg font-semibold">Network Insights</h3>
+            <Badge variant="secondary" className="text-xs">Anonymized franchise data</Badge>
+          </div>
+
+          {/* Charts Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <Card className="rounded-2xl shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-sm">Performance vs Network</CardTitle>
+              </CardHeader>
+              <CardContent className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={networkChartData.performanceComparison}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="metric" fontSize={10} />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="yourClinic" fill="#0ea5e9" name="Your Clinic" />
+                    <Bar dataKey="networkAvg" fill="#8b5cf6" name="Network Avg" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-2xl shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-sm">Tactics Adoption Rate</CardTitle>
+              </CardHeader>
+              <CardContent className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie 
+                      data={networkChartData.tacticsAdoption}
+                      dataKey="adopted"
+                      nameKey="tactic"
+                      cx="50%" 
+                      cy="50%" 
+                      outerRadius={80}
+                      fill="#8b5cf6"
+                    >
+                      {networkChartData.tacticsAdoption.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Insights Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {networkInsights.map((insight) => {
+              const ActionIcon = getActionIcon(insight.actionType);
+              return (
+                <Card key={insight.id} className="rounded-2xl shadow-sm">
+                  <CardContent className="p-4">
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 rounded-xl bg-muted">
+                          <Network className="h-5 w-5" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium">{insight.title}</div>
+                          <div className="text-sm text-muted-foreground mt-1">{insight.metric}</div>
+                          <Badge variant="outline" className="text-xs mt-2">{insight.category}</Badge>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className={`text-xs ${getImpactColor(insight.impact)}`}>
+                            {insight.impact}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {insight.effort} effort
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        📊 <strong>Data:</strong> {insight.dataSource}
+                      </div>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="w-fit"
+                        onClick={() => handleActionClick(insight)}
+                      >
+                        <ActionIcon className="h-3 w-3 mr-2" />
+                        {getActionLabel(insight.actionType)}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="industry" className="space-y-6 mt-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Lightbulb className="h-5 w-5 text-yellow-600" />
+            <h3 className="text-lg font-semibold">Industry Insights</h3>
+            <Badge variant="secondary" className="text-xs">Cross-platform data</Badge>
+          </div>
+
+          {/* Charts Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <Card className="rounded-2xl shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-sm">Average Improvements by Category</CardTitle>
+              </CardHeader>
+              <CardContent className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={generalChartData.industryBenchmarks}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="category" fontSize={10} />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="avgImprovement" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-2xl shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-sm">Tactics by Impact Level</CardTitle>
+              </CardHeader>
+              <CardContent className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie 
+                      data={generalChartData.tacticsByImpact}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%" 
+                      cy="50%" 
+                      outerRadius={80}
+                    >
+                      {generalChartData.tacticsByImpact.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Insights Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {generalInsights.map((insight) => {
+              const ActionIcon = getActionIcon(insight.actionType);
+              return (
+                <Card key={insight.id} className="rounded-2xl shadow-sm">
+                  <CardContent className="p-4">
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 rounded-xl bg-muted">
+                          <Lightbulb className="h-5 w-5" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium">{insight.title}</div>
+                          <div className="text-sm text-muted-foreground mt-1">{insight.metric}</div>
+                          <Badge variant="outline" className="text-xs mt-2">{insight.category}</Badge>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className={`text-xs ${getImpactColor(insight.impact)}`}>
+                            {insight.impact}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {insight.effort} effort
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        🌍 <strong>Data:</strong> {insight.dataSource}
+                      </div>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="w-fit"
+                        onClick={() => handleActionClick(insight)}
+                      >
+                        <ActionIcon className="h-3 w-3 mr-2" />
+                        {getActionLabel(insight.actionType)}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </TabsContent>
+      </Tabs>
+
+
+      {/* Playbooks */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 mb-4">
+          <BookOpen className="h-5 w-5 text-green-600" />
+          <h3 className="text-lg font-semibold">How-To Playbooks</h3>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {playbooks.map((playbook, i) => (
+            <Card key={i} className="rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="p-4">
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="font-medium">{playbook.title}</div>
+                    <Badge variant="secondary" className="text-xs">{playbook.category}</Badge>
+                  </div>
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {playbook.readTime}
+                    </div>
+                    <div>{playbook.steps} steps</div>
+                  </div>
+                  <Button size="sm" variant="outline" className="w-fit">
+                    <BookOpen className="h-3 w-3 mr-2" />
+                    Read Guide
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HqLocations() {
+  return (
+    <div className="space-y-6">
+      <SectionTitle icon={Building2} title="Franchise HQ" desc="Multi-location roll-up insights" />
+      <Card className="rounded-2xl shadow-sm">
+        <CardHeader><CardTitle>Locations</CardTitle></CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Location</TableHead>
+                <TableHead>Bookings</TableHead>
+                <TableHead>Conv%</TableHead>
+                <TableHead>Revenue</TableHead>
+                <TableHead>Health</TableHead>
+                <TableHead>Alerts</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {locations.map((l, i) => (
+                <TableRow key={i}>
+                  <TableCell className="font-medium">{l.name}</TableCell>
+                  <TableCell>{l.bookings}</TableCell>
+                  <TableCell>{l.conv}%</TableCell>
+                  <TableCell>${l.rev.toLocaleString()}</TableCell>
+                  <TableCell>{"●".repeat(l.health)}{"○".repeat(5 - l.health)}</TableCell>
+                  <TableCell>{l.alerts}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// ————————————————————————————————————————————
+// App Shell
+// ————————————————————————————————————————————
+const nav = [
+  { key: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { key: "business-details", label: "Business Details", icon: BadgeCheck },
+  { key: "integrations", label: "Integrations", icon: Puzzle },
+  { key: "insights", label: "Insights", icon: BarChart3 },
+  { key: "leads", label: "Leads", icon: Users },
+  { key: "outreach", label: "Outreach", icon: Send },
+  { key: "utilization", label: "Utilization", icon: BarChart3 },
+  { key: "settings", label: "Settings", icon: Settings },
+];
+
+export default function BookingAgentBusiness() {
+  const [active, setActive] = useState("dashboard");
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+      {/* Top bar */}
+      <div className="sticky top-0 z-30 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-slate-900/60 border-b">
+        <div className="mx-auto max-w-[1400px] px-4 py-3 flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} className="h-8 w-8 rounded-2xl bg-gradient-to-br from-sky-500 to-emerald-400" />
+            <div className="font-semibold tracking-tight">Booking Agent</div>
+            <Badge variant="secondary" className="ml-1">Business</Badge>
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search…" className="pl-9 w-72" />
+            </div>
+            <Avatar className="h-8 w-8"><AvatarFallback>LA</AvatarFallback></Avatar>
+          </div>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div className="mx-auto max-w-[1400px] px-4 py-6 grid grid-cols-12 gap-6">
+        {/* Sidebar */}
+        <aside className="col-span-12 md:col-span-3 xl:col-span-2">
+          <nav className="grid gap-1">
+            {nav.map((item) => {
+              const Icon = item.icon as any;
+              const activeCls = active === item.key ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900" : "bg-white/60 dark:bg-slate-900/60";
+              return (
+                <button
+                  key={item.key}
+                  onClick={() => setActive(item.key)}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm shadow-sm hover:shadow transition ${activeCls}`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {item.label}
+                </button>
+              );
+            })}
+          </nav>
+
+          <Card className="rounded-2xl shadow-sm mt-6">
+            <CardHeader>
+              <CardTitle className="text-sm">Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Button variant="secondary" className="w-full"><Calendar className="h-4 w-4 mr-2" /> Connect Calendar</Button>
+              <Button variant="secondary" className="w-full"><Globe className="h-4 w-4 mr-2" /> Get Chat Script</Button>
+              <Button variant="secondary" className="w-full"><Phone className="h-4 w-4 mr-2" /> Configure Voice</Button>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl shadow-sm mt-6">
+            <CardHeader>
+              <CardTitle className="text-sm">Compliance</CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground space-y-2">
+              <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4" /> HIPAA-ready (health vertical)</div>
+              <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4" /> GDPR tools & data export</div>
+            </CardContent>
+          </Card>
+        </aside>
+
+        {/* Main content */}
+        <main className="col-span-12 md:col-span-9 xl:col-span-10">
+          {active === "dashboard" && <Dashboard />}
+          {active === "business-details" && <BusinessDetails />}
+          {active === "integrations" && <Integrations />}
+          {active === "insights" && <Insights />}
+          {active === "leads" && <Leads />}
+          {active === "outreach" && <Outreach />}
+          {active === "utilization" && <Utilization />}
+          {active === "settings" && <SettingsScreen />}
+        </main>
+      </div>
+
+      {/* Footer */}
+      <div className="border-t">
+        <div className="mx-auto max-w-[1400px] px-4 py-6 text-xs text-muted-foreground flex items-center justify-between">
+          <div>© {new Date().getFullYear()} Booking Agent — All rights reserved.</div>
+          <div className="flex items-center gap-4">
+            <a className="hover:underline" href="#">Status</a>
+            <a className="hover:underline" href="#">Privacy</a>
+            <a className="hover:underline" href="#">Terms</a>
+          </div>
+        </div>
+      </div>
+
+      {/* AI Agent Chat */}
+      <AIAgentChat context="business" businessName="The Joint Chiropractic – Gadsden" />
+    </div>
+  );
+}

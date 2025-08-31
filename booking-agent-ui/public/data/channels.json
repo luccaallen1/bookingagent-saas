@@ -1,0 +1,64 @@
+{
+  "bookings_by_source": [
+    { "label": "Voice Agent", "bookings": 1180, "tag": "Inbound", "percentage": 36 },
+    { "label": "Website Chat", "bookings": 920, "tag": "Inbound", "percentage": 28 },
+    { "label": "Instagram DM", "bookings": 430, "tag": "Inbound", "percentage": 13 },
+    { "label": "Newsletter Link", "bookings": 370, "tag": "Outreach", "percentage": 11 },
+    { "label": "SMS Link", "bookings": 160, "tag": "Inbound", "percentage": 5 },
+    { "label": "SMS Campaign", "bookings": 150, "tag": "Outreach", "percentage": 5 },
+    { "label": "QR Code", "bookings": 70, "tag": "Outreach", "percentage": 2 }
+  ],
+  "funnels": [
+    { 
+      "channel": "Voice Agent", 
+      "conversations": 4200, 
+      "engaged": 3000, 
+      "bookings": 1180 
+    },
+    { 
+      "channel": "Website Chat", 
+      "conversations": 3500, 
+      "engaged": 2100, 
+      "bookings": 920 
+    },
+    { 
+      "channel": "Instagram DM", 
+      "conversations": 1800, 
+      "engaged": 980, 
+      "bookings": 430 
+    },
+    { 
+      "channel": "Newsletter Link", 
+      "conversations": 920, 
+      "engaged": 610, 
+      "bookings": 370 
+    },
+    { 
+      "channel": "SMS Link", 
+      "conversations": 480, 
+      "engaged": 280, 
+      "bookings": 160 
+    },
+    { 
+      "channel": "SMS Campaign", 
+      "conversations": 450, 
+      "engaged": 250, 
+      "bookings": 150 
+    },
+    { 
+      "channel": "QR Code", 
+      "conversations": 180, 
+      "engaged": 110, 
+      "bookings": 70 
+    }
+  ],
+  "adoption_vs_results": [
+    { "channel": "Voice Agent", "adoption_pct": 0.92, "avg_bookings": 20.3 },
+    { "channel": "Website Chat", "adoption_pct": 0.88, "avg_bookings": 15.9 },
+    { "channel": "Instagram DM", "adoption_pct": 0.68, "avg_bookings": 7.4 },
+    { "channel": "Newsletter Link", "adoption_pct": 0.75, "avg_bookings": 6.4 },
+    { "channel": "SMS Link", "adoption_pct": 0.52, "avg_bookings": 2.8 },
+    { "channel": "SMS Campaign", "adoption_pct": 0.48, "avg_bookings": 2.6 },
+    { "channel": "QR Code", "adoption_pct": 0.45, "avg_bookings": 1.2 }
+  ]
+}

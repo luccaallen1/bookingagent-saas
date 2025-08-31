@@ -1,0 +1,204 @@
+{
+  "rows": [
+    {
+      "location": "Dallas, TX",
+      "conversations": 420,
+      "bookings": 142,
+      "conversion": 0.338,
+      "revenue": 9120,
+      "channels": ["Voice", "Web", "IG", "Newsletter", "QR"],
+      "calendar_connected": true,
+      "alerts": []
+    },
+    {
+      "location": "Scottsdale, AZ",
+      "conversations": 385,
+      "bookings": 131,
+      "conversion": 0.340,
+      "revenue": 8415,
+      "channels": ["Voice", "Web", "IG", "SMS", "Newsletter"],
+      "calendar_connected": true,
+      "alerts": []
+    },
+    {
+      "location": "Nashville, TN",
+      "conversations": 398,
+      "bookings": 128,
+      "conversion": 0.322,
+      "revenue": 8220,
+      "channels": ["Voice", "Web", "Newsletter", "SMS"],
+      "calendar_connected": true,
+      "alerts": []
+    },
+    {
+      "location": "Boulder, CO",
+      "conversations": 210,
+      "bookings": 34,
+      "conversion": 0.162,
+      "revenue": 2040,
+      "channels": ["Web"],
+      "calendar_connected": false,
+      "alerts": ["No calendar", "Low channel adoption"]
+    },
+    {
+      "location": "Austin, TX",
+      "conversations": 365,
+      "bookings": 119,
+      "conversion": 0.326,
+      "revenue": 7640,
+      "channels": ["Voice", "Web", "IG", "Newsletter"],
+      "calendar_connected": true,
+      "alerts": []
+    },
+    {
+      "location": "Tampa, FL",
+      "conversations": 342,
+      "bookings": 116,
+      "conversion": 0.339,
+      "revenue": 7450,
+      "channels": ["Voice", "Web", "SMS", "Newsletter", "QR"],
+      "calendar_connected": true,
+      "alerts": []
+    },
+    {
+      "location": "Phoenix, AZ",
+      "conversations": 358,
+      "bookings": 114,
+      "conversion": 0.318,
+      "revenue": 7320,
+      "channels": ["Voice", "Web", "IG", "SMS"],
+      "calendar_connected": true,
+      "alerts": []
+    },
+    {
+      "location": "Denver, CO",
+      "conversations": 334,
+      "bookings": 108,
+      "conversion": 0.323,
+      "revenue": 6935,
+      "channels": ["Voice", "Web", "Newsletter"],
+      "calendar_connected": true,
+      "alerts": []
+    },
+    {
+      "location": "Portland, OR",
+      "conversations": 315,
+      "bookings": 104,
+      "conversion": 0.330,
+      "revenue": 6680,
+      "channels": ["Voice", "Web", "IG", "SMS", "Newsletter"],
+      "calendar_connected": true,
+      "alerts": []
+    },
+    {
+      "location": "Salt Lake City, UT",
+      "conversations": 322,
+      "bookings": 100,
+      "conversion": 0.311,
+      "revenue": 6420,
+      "channels": ["Voice", "Web", "Newsletter"],
+      "calendar_connected": true,
+      "alerts": []
+    },
+    {
+      "location": "Madison, WI",
+      "conversations": 288,
+      "bookings": 98,
+      "conversion": 0.340,
+      "revenue": 6295,
+      "channels": ["Voice", "Web", "IG", "QR"],
+      "calendar_connected": true,
+      "alerts": []
+    },
+    {
+      "location": "Boise, ID",
+      "conversations": 269,
+      "bookings": 97,
+      "conversion": 0.361,
+      "revenue": 6230,
+      "channels": ["Voice", "Web", "SMS", "Newsletter"],
+      "calendar_connected": true,
+      "alerts": []
+    },
+    {
+      "location": "Charlotte, NC",
+      "conversations": 310,
+      "bookings": 95,
+      "conversion": 0.306,
+      "revenue": 6100,
+      "channels": ["Voice", "Web", "IG"],
+      "calendar_connected": true,
+      "alerts": []
+    },
+    {
+      "location": "Burlington, VT",
+      "conversations": 278,
+      "bookings": 89,
+      "conversion": 0.320,
+      "revenue": 5715,
+      "channels": ["Voice", "Web", "Newsletter", "QR"],
+      "calendar_connected": true,
+      "alerts": []
+    },
+    {
+      "location": "Irvine, CA",
+      "conversations": 295,
+      "bookings": 88,
+      "conversion": 0.298,
+      "revenue": 5650,
+      "channels": ["Voice", "Web", "IG", "SMS"],
+      "calendar_connected": true,
+      "alerts": []
+    },
+    {
+      "location": "San Diego, CA",
+      "conversations": 290,
+      "bookings": 85,
+      "conversion": 0.293,
+      "revenue": 5460,
+      "channels": ["Voice", "Web", "Newsletter"],
+      "calendar_connected": true,
+      "alerts": []
+    },
+    {
+      "location": "Atlanta, GA",
+      "conversations": 275,
+      "bookings": 82,
+      "conversion": 0.298,
+      "revenue": 5265,
+      "channels": ["Voice", "Web"],
+      "calendar_connected": true,
+      "alerts": ["Low channel adoption"]
+    },
+    {
+      "location": "Miami, FL",
+      "conversations": 268,
+      "bookings": 78,
+      "conversion": 0.291,
+      "revenue": 5010,
+      "channels": ["Voice", "Web", "IG", "SMS"],
+      "calendar_connected": true,
+      "alerts": []
+    },
+    {
+      "location": "Seattle, WA",
+      "conversations": 255,
+      "bookings": 75,
+      "conversion": 0.294,
+      "revenue": 4815,
+      "channels": ["Voice", "Web", "Newsletter"],
+      "calendar_connected": true,
+      "alerts": []
+    },
+    {
+      "location": "Boston, MA",
+      "conversations": 248,
+      "bookings": 71,
+      "conversion": 0.286,
+      "revenue": 4560,
+      "channels": ["Voice", "Web"],
+      "calendar_connected": false,
+      "alerts": ["No calendar", "Low channel adoption"]
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "cards": [
+    {
+      "id": "peer_newsletter_back_pain",
+      "icon": "📧",
+      "title": "Condition newsletters (Back/Neck/Sciatica)",
+      "metric": "Avg 5-8 bookings/send",
+      "tag": "Outreach",
+      "evidence_note": "Based on 47 locations",
+      "cta": { "label": "Publish Playbook", "link": "/hq/action-center" }
+    },
+    {
+      "id": "peer_ig_bio_link",
+      "icon": "📲",
+      "title": "Add chatbot link to Instagram bio",
+      "metric": "Avg +4 bookings/month",
+      "tag": "Placement",
+      "evidence_note": "Across 29 locations",
+      "cta": { "label": "Notify Franchisees", "link": "/hq/action-center" }
+    },
+    {
+      "id": "peer_voice_greeting",
+      "icon": "☎️",
+      "title": "Optimize voice agent greeting script",
+      "metric": "28% higher engagement",
+      "tag": "Voice",
+      "evidence_note": "Top 10 performing locations",
+      "cta": { "label": "Deploy Script", "link": "/hq/action-center" }
+    },
+    {
+      "id": "peer_sms_timing",
+      "icon": "⏰",
+      "title": "SMS campaigns Tue/Thu 10am",
+      "metric": "+35% response rate",
+      "tag": "Scheduling",
+      "evidence_note": "112 campaigns analyzed",
+      "cta": { "label": "Schedule Campaign", "link": "/hq/action-center" }
+    },
+    {
+      "id": "peer_faq_pricing",
+      "icon": "💬",
+      "title": "Update FAQ with insurance details",
+      "metric": "Reduce pricing questions 40%",
+      "tag": "Content",
+      "evidence_note": "38 locations updated",
+      "cta": { "label": "Update Template", "link": "/hq/action-center" }
+    },
+    {
+      "id": "peer_qr_placement",
+      "icon": "🏪",
+      "title": "QR codes at reception desk",
+      "metric": "8.2 bookings/month avg",
+      "tag": "Placement",
+      "evidence_note": "26 locations with QR",
+      "cta": { "label": "Generate QR Codes", "link": "/hq/action-center" }
+    },
+    {
+      "id": "peer_testimonial_content",
+      "icon": "⭐",
+      "title": "Include patient testimonials",
+      "metric": "+28% click-through rate",
+      "tag": "Content",
+      "evidence_note": "15 A/B tests completed",
+      "cta": { "label": "Create Template", "link": "/hq/action-center" }
+    },
+    {
+      "id": "peer_multi_channel",
+      "icon": "🔄",
+      "title": "Activate 4+ booking channels",
+      "metric": "62% higher conversion",
+      "tag": "Strategy",
+      "evidence_note": "Top quartile locations",
+      "cta": { "label": "Channel Audit", "link": "/hq/action-center" }
+    }
+  ]
+}
