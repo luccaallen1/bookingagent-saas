@@ -33,7 +33,7 @@ export function CampaignsView({ period }: CampaignsViewProps) {
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [scheduleType, setScheduleType] = useState<'now' | 'scheduled'>('now');
   const [showTemplatePreview, setShowTemplatePreview] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<{id: string; name: string; content: string; subject?: string} | null>(null);
   
   // Campaign form state
   const [campaignForm, setCampaignForm] = useState({

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   LayoutDashboard,
@@ -395,12 +396,25 @@ function Dashboard() {
 }
 
 function BusinessDetails() {
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [faqs, setFaqs] = useState([
     { id: 1, question: "Do you take walk-ins?", answer: "Yes, subject to availability." }
   ]);
-  const Next = () => setStep((s) => Math.min(4, s + 1));
+  const [qualifyingQuestions, setQualifyingQuestions] = useState([
+    { id: 1, question: "Are you a new patient?", mandatory: true },
+    { id: 2, question: "Have you had chiropractic care before?", mandatory: false },
+    { id: 3, question: "What is your main concern today?", mandatory: true }
+  ]);
+  const Next = () => setStep((s) => Math.min(5, s + 1));
   const Back = () => setStep((s) => Math.max(1, s - 1));
+  
+  const handleFinish = () => {
+    // Save data here if needed (could add API call)
+    console.log('Saving business details...', { qualifyingQuestions, faqs });
+    // Navigate to dashboard
+    router.push('/hq');
+  };
   
   const addFaq = () => {
     setFaqs([...faqs, { id: Date.now(), question: "", answer: "" }]);
@@ -425,9 +439,11 @@ function BusinessDetails() {
             <ChevronRight className="h-4 w-4" />
             <span className={step >= 2 ? "font-semibold text-foreground" : ""}>2. Services</span>
             <ChevronRight className="h-4 w-4" />
-            <span className={step >= 3 ? "font-semibold text-foreground" : ""}>3. Hours</span>
+            <span className={step >= 3 ? "font-semibold text-foreground" : ""}>3. Qualifying Questions</span>
             <ChevronRight className="h-4 w-4" />
-            <span className={step >= 4 ? "font-semibold text-foreground" : ""}>4. FAQs & Link</span>
+            <span className={step >= 4 ? "font-semibold text-foreground" : ""}>4. Hours</span>
+            <ChevronRight className="h-4 w-4" />
+            <span className={step >= 5 ? "font-semibold text-foreground" : ""}>5. FAQs & Link</span>
           </div>
         </CardHeader>
         <CardContent className="grid gap-6 pt-6">
@@ -502,6 +518,84 @@ function BusinessDetails() {
           )}
 
           {step === 3 && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold">Qualifying Questions</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    These questions will be asked by the voice agent before booking appointments.
+                    Mark questions as mandatory if customers must answer them.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                {qualifyingQuestions.map((q, index) => (
+                  <Card key={q.id} className="rounded-xl">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-1 space-y-3">
+                          <div className="space-y-2">
+                            <Label>Question {index + 1}</Label>
+                            <Input 
+                              value={q.question}
+                              onChange={(e) => {
+                                const updated = [...qualifyingQuestions];
+                                updated[index].question = e.target.value;
+                                setQualifyingQuestions(updated);
+                              }}
+                              placeholder="Enter your qualifying question..."
+                            />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Switch 
+                                checked={q.mandatory}
+                                onCheckedChange={(checked) => {
+                                  const updated = [...qualifyingQuestions];
+                                  updated[index].mandatory = checked;
+                                  setQualifyingQuestions(updated);
+                                }}
+                              />
+                              <Label className="text-sm font-normal cursor-pointer">
+                                Mandatory question
+                              </Label>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setQualifyingQuestions(qualifyingQuestions.filter(item => item.id !== q.id));
+                              }}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              
+              <Button 
+                variant="secondary" 
+                className="w-fit"
+                onClick={() => {
+                  const newId = Math.max(...qualifyingQuestions.map(q => q.id), 0) + 1;
+                  setQualifyingQuestions([...qualifyingQuestions, { 
+                    id: newId, 
+                    question: "", 
+                    mandatory: false 
+                  }]);
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" /> Add qualifying question
+              </Button>
+            </div>
+          )}
+
+          {step === 4 && (
             <div className="space-y-6">
               {/* Service Selection */}
               <div className="space-y-2">
@@ -623,7 +717,7 @@ function BusinessDetails() {
             </div>
           )}
 
-          {step === 4 && (
+          {step === 5 && (
             <div className="grid gap-4">
               <div className="space-y-2">
                 <Label>Website Link</Label>
@@ -691,10 +785,10 @@ function BusinessDetails() {
 
           <div className="flex items-center justify-between pt-2">
             <Button variant="ghost" onClick={Back} disabled={step === 1}>Back</Button>
-            {step < 4 ? (
+            {step < 5 ? (
               <Button onClick={Next}>Continue</Button>
             ) : (
-              <Button>Finish & Go to Dashboard</Button>
+              <Button onClick={handleFinish}>Finish & Go to Dashboard</Button>
             )}
           </div>
         </CardContent>

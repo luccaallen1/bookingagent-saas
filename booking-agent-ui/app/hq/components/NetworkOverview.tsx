@@ -356,7 +356,7 @@ export function NetworkOverview({ period }: NetworkOverviewProps) {
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">What's the price for consultation?</span>
+                <span className="text-sm font-medium">What&apos;s the price for consultation?</span>
                 <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
                   98 asks
                 </span>
